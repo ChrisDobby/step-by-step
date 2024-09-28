@@ -1,1 +1,3 @@
-export const test = 'test'
+import { testSingleState } from "./testStates"
+
+export { testSingleState }

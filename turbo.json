@@ -17,7 +17,11 @@
         "types",
         "build"
       ],
-      "outputs": []
+      "outputs": [],
+      "env": [
+        "AWS_REGION",
+        "AWS_ROLE_ARN"
+      ]
     },
     "lint": {
       "outputs": []

@@ -15,11 +15,14 @@
     "types": "tsc --incremental",
     "lint": "eslint src/ --max-warnings=0",
     "build": "rimraf ./dist && npm run build:lib & npm run build:types",
-    "build:lib": "esbuild src/index.ts --platform=node --outfile=dist/index.js",
+    "build:lib": "esbuild src/**/*.ts --platform=node --outdir=dist",
     "build:types": "tsc --emitDeclarationOnly --declaration"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/chrisdobby/step-by-step.git"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sfn": "^3.658.1"
   }
 }
