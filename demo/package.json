@@ -1,0 +1,18 @@
+{
+  "name": "@chrisdobby/step-by-step-demo",
+  "version": "0.0.1",
+  "description": "",
+  "author": "chrisdobby",
+  "license": "MIT",
+  "scripts": {
+    "types": "tsc --noEmit --incremental",
+    "lint": "eslint src/ --max-warnings=0",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "vitest": "^2.1.1"
+  },
+  "devDependencies": {
+    "@chrisdobby/step-by-step": "*"
+  }
+}

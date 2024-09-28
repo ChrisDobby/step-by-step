@@ -1,0 +1,25 @@
+{
+  "name": "@chrisdobby/step-by-step",
+  "version": "0.0.1",
+  "description": "",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "author": "chrisdobby",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chrisdobby/step-by-step/issues"
+  },
+  "homepage": "https://github.com/chrisdobby/step-by-step#readme",
+  "scripts": {
+    "types": "tsc --incremental",
+    "lint": "eslint src/ --max-warnings=0",
+    "build": "rimraf ./dist && npm run build:lib & npm run build:types",
+    "build:lib": "esbuild src/index.ts --platform=node --outfile=dist/index.js",
+    "build:types": "tsc --emitDeclarationOnly --declaration"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chrisdobby/step-by-step.git"
+  }
+}
