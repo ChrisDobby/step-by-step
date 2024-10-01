@@ -1,6 +1,11 @@
 import { testSingleState, testFunction, testSubset } from "@chrisdobby/step-by-step"
 
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 describe("simple tests", () => {
+  beforeEach(async () => {
+    await wait(1000)
+  })
+
   it("should test a single state", async () => {
     const result = await testSingleState({
       stateDefinition: { Type: "Pass", Next: "state 2" },
