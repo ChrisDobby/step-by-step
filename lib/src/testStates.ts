@@ -1,5 +1,5 @@
 import { SFNClient, TestStateCommand } from "@aws-sdk/client-sfn"
-import { TestFunctionInput, TestFunctionOutput, TestSingleStateInput, TestSingleStateOutput } from "./types"
+import { TestFunctionInput, TestFunctionOutput, TestSingleStateInput, TestSingleStateOutput, TestSubsetInput } from "./types"
 
 const client = new SFNClient({ region: process.env.AWS_REGION })
 
@@ -25,14 +25,21 @@ const execute = async ({
   input,
   state,
   stack = [],
-}: TestFunctionInput & { state: string; stack?: TestFunctionOutput["stack"] }): Promise<TestFunctionOutput> => {
+  endState,
+}: TestFunctionInput & {
+  state: string
+  stack?: TestFunctionOutput["stack"]
+  endState?: string
+}): Promise<TestFunctionOutput> => {
   const stateDefinition = functionDefinition.States[state]
   const result = await testSingleState({ stateDefinition, input })
   const updatedStack = [...stack, { ...result, stateName: state }]
-  return stateDefinition.End ? { ...result, stack: updatedStack } : execute({ functionDefinition, input: result.output, state: result.nextState!, stack: updatedStack })
+  console.log("state", state, endState)
+  return stateDefinition.End || state === endState
+    ? { ...result, stack: updatedStack }
+    : execute({ functionDefinition, input: result.output, state: result.nextState!, stack: updatedStack, endState })
 }
 
-export const testFunction = async ({ functionDefinition, input }: TestFunctionInput) => {
-  const result = execute({ functionDefinition, input, state: functionDefinition.StartAt })
-  return result
-}
+export const testFunction = async ({ functionDefinition, input }: TestFunctionInput) => execute({ functionDefinition, input, state: functionDefinition.StartAt })
+
+export const testSubset = async ({ functionDefinition, input, startState, endState }: TestSubsetInput) => execute({ functionDefinition, input, state: startState, endState })

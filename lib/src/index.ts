@@ -1,3 +1,1 @@
-import { testSingleState } from "./testStates"
-
-export { testSingleState }
+export * from "./testStates"

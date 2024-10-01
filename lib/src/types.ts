@@ -32,3 +32,8 @@ export type TestFunctionOutput = {
   output?: Record<string, unknown>
   stack: (TestSingleStateOutput & { stateName: string })[]
 }
+
+export type TestSubsetInput = TestFunctionInput & {
+  startState: string
+  endState: string
+}
