@@ -1,0 +1,28 @@
+name: Pushed
+run-name: Pushed 🌴${{ github.ref_name }}
+"on":
+  push:
+    branches-ignore:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  pushed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+
+      - name: Setting up NodeJs
+        id: setup-node-js
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: .nvmrc
+
+      - name: Build
+        id: build
+        uses: ./.github/workflows/build

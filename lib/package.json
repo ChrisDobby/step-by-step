@@ -24,5 +24,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-sfn": "^3.658.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -1,0 +1,37 @@
+name: Release
+run-name: Releasing 🌴${{ github.ref_name }}
+"on":
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+
+      - name: Setting up NodeJs
+        id: setup-node-js
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: .nvmrc
+
+      - name: Build
+        id: build
+        uses: ./.github/workflows/build
+
+      - name: Release
+        id: release
+        run: npx semantic-release
+        shell: bash
+        working-directory: ./lib
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
