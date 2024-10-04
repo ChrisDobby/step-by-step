@@ -263,11 +263,10 @@ The next state returned
 
 ## Demo
 
-The [demo](../demo/) will run a number of tests using vitest.
-
-To run it ensure the docker daemon is running and run
+The [demo](../demo/) will run a number of tests using vitest. Ensure the environment variables are set and run
 
 ```
-npm run build
-npm run demo
+npm run test
 ```
+
+This will build the library and run the tests.
