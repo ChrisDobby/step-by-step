@@ -10,7 +10,7 @@
   "bugs": {
     "url": "https://github.com/chrisdobby/step-by-step/issues"
   },
-  "homepage": "https://github.com/chrisdobby/step-by-step#readme",
+  "homepage": "https://github.com/ChrisDobby/step-by-step/blob/main/lib/README.md",
   "scripts": {
     "types": "tsc --incremental",
     "lint": "eslint src/ --max-warnings=0",
