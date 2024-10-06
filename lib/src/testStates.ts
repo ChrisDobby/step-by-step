@@ -6,6 +6,7 @@ import {
   TestSingleStateOutput,
   TestSubsetInput,
 } from "./types"
+import { transformState } from "./utils"
 
 const client = new SFNClient({ region: process.env.AWS_REGION })
 
@@ -15,7 +16,7 @@ export const testSingleState = async ({
 }: TestSingleStateInput): Promise<TestSingleStateOutput> => {
   const result = await client.send(
     new TestStateCommand({
-      definition: JSON.stringify(stateDefinition),
+      definition: JSON.stringify(transformState(stateDefinition)),
       roleArn: process.env.AWS_ROLE_ARN!,
       input: JSON.stringify(input),
     })
