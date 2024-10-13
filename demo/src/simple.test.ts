@@ -1,5 +1,4 @@
 import { testSingleState, testFunction, testSubset } from "@chrisdobby/step-by-step"
-import { wait } from "@chrisdobby/step-by-step/src/utils"
 
 describe("simple tests", () => {
   it("should test a single state", async () => {
