@@ -1,5 +1,4 @@
 import { testFunction, mockState, mockStateOnce, mockStateTimes, resetMocks } from "@chrisdobby/step-by-step"
-import { wait } from "@chrisdobby/step-by-step/src/utils"
 
 describe("mock tests", () => {
   beforeEach(resetMocks)
