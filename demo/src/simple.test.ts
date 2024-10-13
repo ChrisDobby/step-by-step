@@ -1,6 +1,6 @@
 import { testSingleState, testFunction, testSubset } from "@chrisdobby/step-by-step"
+import { wait } from "@chrisdobby/step-by-step/src/utils"
 
-const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 describe("simple tests", () => {
   beforeEach(async () => {
     await wait(1000)

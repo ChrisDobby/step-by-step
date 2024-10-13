@@ -23,11 +23,12 @@ export type TestFunctionInput = {
   input?: Record<string, unknown>
 }
 
+type OutputError = {
+  message: string
+  cause: string
+}
 export type TestFunctionOutput = {
-  error?: {
-    message: string
-    cause: string
-  }
+  error?: OutputError
   status?: TestExecutionStatus
   output?: Record<string, unknown>
   stack: (TestSingleStateOutput & { stateName: string })[]
@@ -37,3 +38,15 @@ export type TestSubsetInput = TestFunctionInput & {
   startState: string
   endState: string
 }
+
+export type MockedState = { output?: Record<string, unknown>; error?: OutputError; nextState?: string }
+
+type StateMockAlways = MockedState & {
+  deleteWhenUsed: true
+}
+
+type StateMockSingle = MockedState & {
+  deleteWhenUsed: false
+}
+
+export type StateMock = StateMockAlways | StateMockSingle
