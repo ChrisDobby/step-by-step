@@ -261,6 +261,96 @@ Default: `undefined`
 
 The next state returned
 
+### mockState([stateName], [mockedState])
+
+Mocks a state
+
+#### stateName
+
+Type: `string`<br>
+
+Specifies the state that will be mocked.
+
+#### mockedState
+
+Type: `Object`<br>
+
+##### output
+
+Type: `Object`<br>
+Default: `undefined`
+
+The output to return from the state
+
+##### error
+
+Type: `Object`<br>
+Default: `undefined`
+
+The error to return from the state
+
+### mockStateOnce([stateName], [mockedState])
+
+Mocks a single state execution
+
+#### stateName
+
+Type: `string`<br>
+
+Specifies the state that will be mocked.
+
+#### mockedState
+
+Type: `Object`<br>
+
+##### output
+
+Type: `Object`<br>
+Default: `undefined`
+
+The output to return from the state
+
+##### error
+
+Type: `Object`<br>
+Default: `undefined`
+
+The error to return from the state
+
+### mockStateTimes([times], [stateName], [mockedState])
+
+Mocks a state execution for the specified number of times
+
+#### times
+
+Type: `number`<br>
+
+The number of executions to mock with the specified state
+
+#### stateName
+
+Type: `string`<br>
+
+Specifies the state that will be mocked.
+
+#### mockedState
+
+Type: `Object`<br>
+
+##### output
+
+Type: `Object`<br>
+Default: `undefined`
+
+The output to return from the state
+
+##### error
+
+Type: `Object`<br>
+Default: `undefined`
+
+The error to return from the state
+
 ## Demo
 
 The [demo](../demo/) will run a number of tests using vitest. Ensure the environment variables are set and run
