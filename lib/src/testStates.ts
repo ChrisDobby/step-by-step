@@ -44,7 +44,7 @@ const execute = async ({
   const result = await testSingleState({ stateDefinition, input })
   const updatedStack = [...stack, { ...result, stateName: state }]
 
-  return stateDefinition.End || state === endState
+  return stateDefinition.End || state === endState || result.status === "FAILED"
     ? { ...result, stack: updatedStack }
     : execute({ functionDefinition, input: result.output, state: result.nextState!, stack: updatedStack, endState })
 }
