@@ -1,4 +1,4 @@
-import { SFNClient, TestStateCommand } from "@aws-sdk/client-sfn"
+import { SFNClient, TestStateCommand, TestStateCommandOutput, SFNServiceException } from "@aws-sdk/client-sfn"
 import {
   TestFunctionInput,
   TestFunctionOutput,
@@ -6,21 +6,37 @@ import {
   TestSingleStateOutput,
   TestSubsetInput,
 } from "./types"
-import { transformState } from "./utils"
+import { transformState, wait } from "./utils"
 
 const client = new SFNClient({ region: process.env.AWS_REGION })
 
-export const testSingleState = async ({
-  stateDefinition,
-  input,
-}: TestSingleStateInput): Promise<TestSingleStateOutput> => {
-  const result = await client.send(
-    new TestStateCommand({
-      definition: JSON.stringify(transformState(stateDefinition)),
-      roleArn: process.env.AWS_ROLE_ARN!,
-      input: JSON.stringify(input),
-    })
-  )
+const MAX_ATTEMPTS = 5
+const testState = async (
+  stateDefinition: TestSingleStateInput["stateDefinition"],
+  input: TestSingleStateInput["input"],
+  attempt = 1
+) => {
+  let result: TestStateCommandOutput = { status: "FAILED", $metadata: {} }
+  try {
+    result = await client.send(
+      new TestStateCommand({
+        definition: JSON.stringify(transformState(stateDefinition)),
+        roleArn: process.env.AWS_ROLE_ARN!,
+        input: JSON.stringify(input),
+      })
+    )
+  } catch (e) {
+    if (e instanceof SFNServiceException && e.name === "ThrottlingException") {
+      if (attempt === MAX_ATTEMPTS) {
+        throw e
+      }
+
+      await wait(attempt * 1000)
+      return testState(stateDefinition, input, attempt + 1)
+    }
+
+    throw e
+  }
 
   return {
     error: result.error ? { message: result.error!, cause: result.cause! } : undefined,
@@ -29,6 +45,11 @@ export const testSingleState = async ({
     output: result.output ? JSON.parse(result.output) : undefined,
   }
 }
+
+export const testSingleState = async ({
+  stateDefinition,
+  input,
+}: TestSingleStateInput): Promise<TestSingleStateOutput> => testState(stateDefinition, input)
 
 const execute = async ({
   functionDefinition,
@@ -45,7 +66,7 @@ const execute = async ({
   const result = await testSingleState({ stateDefinition, input })
   const updatedStack = [...stack, { ...result, stateName: state }]
 
-  return stateDefinition.End || state === endState
+  return stateDefinition.End || state === endState || result.status === "FAILED"
     ? { ...result, stack: updatedStack }
     : execute({ functionDefinition, input: result.output, state: result.nextState!, stack: updatedStack, endState })
 }

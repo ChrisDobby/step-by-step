@@ -8,3 +8,5 @@ export const transformState = (stateDefinition: TestSingleStateInput["stateDefin
       return stateDefinition
   }
 }
+
+export const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))

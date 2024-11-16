@@ -1,11 +1,6 @@
 import { testSingleState, testFunction, testSubset } from "@chrisdobby/step-by-step"
 
-const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 describe("simple tests", () => {
-  beforeEach(async () => {
-    await wait(1000)
-  })
-
   it("should test a single state", async () => {
     const result = await testSingleState({
       stateDefinition: { Type: "Pass", Next: "state 2" },
@@ -109,5 +104,42 @@ describe("simple tests", () => {
     expect(result.stack).toHaveLength(3)
     expect(result.stack[1].stateName).toBe("Choice")
     expect(result.stack[2].stateName).toBe("State 2")
+  })
+
+  it("should fail the function when a state fails", async () => {
+    const result = await testFunction({
+      functionDefinition: {
+        StartAt: "State 1",
+        States: {
+          "State 1": {
+            Type: "Pass",
+            Parameters: {
+              result: "state1",
+            },
+            Next: "State 2",
+          },
+          "State 2": {
+            Type: "Task",
+            Resource: "arn:aws:states:::dynamodb:getItem",
+            Parameters: {
+              TableName: "MyDynamoDBTable",
+              Key: {
+                Column: {
+                  S: "MyEntry",
+                },
+              },
+            },
+            Next: "State 3",
+          },
+          "State 3": {
+            Type: "Pass",
+            End: true,
+          },
+        },
+      },
+    })
+
+    expect(result.status).toBe("FAILED")
+    expect(result.stack).toHaveLength(2)
   })
 })
