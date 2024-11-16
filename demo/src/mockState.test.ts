@@ -1,6 +1,6 @@
 import { testFunction, mockState, mockStateOnce, mockStateTimes, resetMocks } from "@chrisdobby/step-by-step"
 
-describe("mock tests", () => {
+describe("mock state tests", () => {
   beforeEach(resetMocks)
 
   it("should mock a state", async () => {
