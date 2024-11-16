@@ -50,3 +50,15 @@ type StateMockSingle = MockedState & {
 }
 
 export type StateMock = StateMockAlways | StateMockSingle
+
+export type MockedResponse = { response?: Record<string, unknown> }
+
+type ResponseMockAlways = MockedResponse & {
+  deleteWhenUsed: true
+}
+
+type ResponseMockSingle = MockedResponse & {
+  deleteWhenUsed: false
+}
+
+export type ResponseMock = ResponseMockAlways | ResponseMockSingle
