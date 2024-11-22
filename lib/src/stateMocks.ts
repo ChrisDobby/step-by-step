@@ -1,3 +1,4 @@
+import { mock, mockOnce, mockTimes } from "./mocks"
 import { MockedState, StateMock } from "./types"
 
 const stateMocks = new Map<string, StateMock[]>()
@@ -25,24 +26,6 @@ export const mockedResult = (stateName: string, nextState?: string) => {
 
 export const reset = () => stateMocks.clear()
 
-export const mockState = (stateName: string, mockedState: MockedState) => {
-  stateMocks.set(
-    stateName,
-    stateMocks.get(stateName)
-      ? [...stateMocks.get(stateName)!, { ...mockedState, deleteWhenUsed: false }]
-      : [{ ...mockedState, deleteWhenUsed: false }]
-  )
-}
-
-export const mockStateOnce = (stateName: string, mockedState: MockedState) => {
-  stateMocks.set(
-    stateName,
-    stateMocks.get(stateName)
-      ? [...stateMocks.get(stateName)!, { ...mockedState, deleteWhenUsed: true }]
-      : [{ ...mockedState, deleteWhenUsed: true }]
-  )
-}
-
-export const mockStateTimes = (times: number, stateName: string, mockedState: MockedState) => {
-  Array.from({ length: times }).forEach(() => mockStateOnce(stateName, mockedState))
-}
+export const mockState = mock(stateMocks)
+export const mockStateOnce = mockOnce(stateMocks)
+export const mockStateTimes = mockTimes(stateMocks)
