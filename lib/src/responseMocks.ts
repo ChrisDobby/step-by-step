@@ -43,7 +43,7 @@ const updateOutputs = (
   }
 }
 
-export const transformState = async (stateName: string, stateDefinition: TestSingleStateInput["stateDefinition"]) => {
+export const transformState = (stateName: string, stateDefinition: TestSingleStateInput["stateDefinition"]) => {
   const mocks = responseMocks.get(stateName)
   if (!mocks || !mocks.length) {
     return stateDefinition
