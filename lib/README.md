@@ -351,6 +351,83 @@ Default: `undefined`
 
 The error to return from the state
 
+### mockResponse([stateName], [mockedResponse])
+
+Mocks a service response
+
+#### stateName
+
+Type: `string`<br>
+
+Specifies the state that will be mocked.
+
+#### mockedResponse
+
+Type: `Object`<br>
+Default: `undefined`
+
+##### response
+
+Type: `Object`<br>
+
+The response to return for the service call
+
+### mockResponseOnce([stateName], [mockedResponse])
+
+Mocks a service response once
+
+#### stateName
+
+Type: `string`<br>
+
+Specifies the state that will be mocked.
+
+#### mockedResponse
+
+Type: `Object`<br>
+Default: `undefined`
+
+##### response
+
+Type: `Object`<br>
+
+The response to return for the service call
+
+### mockResponseTimes([times], [stateName], [mockedResponse])
+
+Mocks a service response a specified number of times
+
+#### times
+
+Type: `number`<br>
+
+The number of executions to mock with the specified response
+
+#### stateName
+
+Type: `string`<br>
+
+Specifies the state that will be mocked.
+
+#### mockedResponse
+
+Type: `Object`<br>
+Default: `undefined`
+
+##### response
+
+Type: `Object`<br>
+
+The response to return for the service call
+
+### mockResponseInit()
+
+Initialises infrstructure required to mock service responses
+
+### mockResponseTearDown()
+
+Tears down infrastructure used to mock service responses
+
 ## Demo
 
 The [demo](../demo/) will run a number of tests using vitest. Ensure the environment variables are set and run
