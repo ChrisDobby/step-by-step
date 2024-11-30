@@ -1,7 +1,7 @@
 import { TestExecutionStatus } from "@aws-sdk/client-sfn"
 
 export type TestSingleStateInput = {
-  state: string
+  state?: string
   stateDefinition: Record<string, unknown>
   input?: Record<string, unknown>
   mockedResult?: TestSingleStateOutput | null

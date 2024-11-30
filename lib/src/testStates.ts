@@ -49,12 +49,12 @@ const testState = async (
 }
 
 export const testSingleState = async ({
-  state,
+  state = "step-by-step-single-state",
   stateDefinition,
   input,
   mockedResult,
 }: TestSingleStateInput): Promise<TestSingleStateOutput> =>
-  mockedResult || testState(transformState(await responseMocks.transformState(state, stateDefinition)), input)
+  mockedResult || testState(transformState(responseMocks.transformState(state, stateDefinition)), input)
 
 const execute = async ({
   functionDefinition,
