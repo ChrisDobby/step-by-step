@@ -1,49 +1,8 @@
-import {
-  LambdaClient,
-  CreateFunctionCommand,
-  GetFunctionCommand,
-  ResourceNotFoundException,
-} from "@aws-sdk/client-lambda"
-import { readFileSync } from "fs"
-
 import { mock, mockOnce, mockTimes } from "./mocks"
 import { ResponseMock, MockedResponse, TestSingleStateInput } from "./types"
+import { createLambdaIfNotExists, deleteLambda, mockFunctionName } from "./utils"
 
-const lamdbaClient = new LambdaClient({ region: process.env.AWS_REGION })
-
-const mockFunctionName = "step-by-step-mock-response"
 const responseMocks = new Map<string, ResponseMock[]>()
-
-const createLambda = async () => {
-  await lamdbaClient.send(
-    new CreateFunctionCommand({
-      FunctionName: mockFunctionName,
-      Runtime: "nodejs20.x",
-      Handler: "index.handler",
-      Role: process.env.AWS_ROLE_ARN!,
-      Code: {
-        ZipFile: readFileSync("./step-by-step-mock-response.zip"),
-      },
-    })
-  )
-}
-
-const createLambdaIfNotExists = async () => {
-  console.log("Creating Lambda function")
-  try {
-    await lamdbaClient.send(
-      new GetFunctionCommand({
-        FunctionName: mockFunctionName,
-      })
-    )
-  } catch (e) {
-    if (!(e instanceof ResourceNotFoundException)) {
-      throw e
-    }
-    console.log("Creating Lambda function")
-    await createLambda()
-  }
-}
 
 const addPayload = (output: unknown) => JSON.parse(JSON.stringify(output).replaceAll("$.", "$.Payload."))
 
@@ -90,7 +49,6 @@ export const transformState = async (stateName: string, stateDefinition: TestSin
     return stateDefinition
   }
 
-  await createLambdaIfNotExists()
   const [mock] = mocks
 
   if (mock.deleteWhenUsed) {
@@ -108,6 +66,8 @@ export const transformState = async (stateName: string, stateDefinition: TestSin
   }
 }
 
+export const init = () => createLambdaIfNotExists()
+export const tearDown = () => deleteLambda()
 export const reset = () => responseMocks.clear()
 
 export const mockResponse = mock(responseMocks)

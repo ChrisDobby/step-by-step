@@ -1,6 +1,9 @@
-import { testFunction, mockResponse } from "@chrisdobby/step-by-step"
+import { testFunction, mockResponse, mockResponseInit, mockResponseTearDown } from "@chrisdobby/step-by-step"
 
 describe("mock response tests", () => {
+  beforeAll(mockResponseInit)
+  afterAll(mockResponseTearDown)
+
   const httpTask = {
     Type: "Task",
     Resource: "arn:aws:states:::http:invoke",
