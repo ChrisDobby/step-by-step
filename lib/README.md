@@ -261,6 +261,173 @@ Default: `undefined`
 
 The next state returned
 
+### mockState([stateName], [mockedState])
+
+Mocks a state
+
+#### stateName
+
+Type: `string`<br>
+
+Specifies the state that will be mocked.
+
+#### mockedState
+
+Type: `Object`<br>
+
+##### output
+
+Type: `Object`<br>
+Default: `undefined`
+
+The output to return from the state
+
+##### error
+
+Type: `Object`<br>
+Default: `undefined`
+
+The error to return from the state
+
+### mockStateOnce([stateName], [mockedState])
+
+Mocks a single state execution
+
+#### stateName
+
+Type: `string`<br>
+
+Specifies the state that will be mocked.
+
+#### mockedState
+
+Type: `Object`<br>
+
+##### output
+
+Type: `Object`<br>
+Default: `undefined`
+
+The output to return from the state
+
+##### error
+
+Type: `Object`<br>
+Default: `undefined`
+
+The error to return from the state
+
+### mockStateTimes([times], [stateName], [mockedState])
+
+Mocks a state execution for the specified number of times
+
+#### times
+
+Type: `number`<br>
+
+The number of executions to mock with the specified state
+
+#### stateName
+
+Type: `string`<br>
+
+Specifies the state that will be mocked.
+
+#### mockedState
+
+Type: `Object`<br>
+
+##### output
+
+Type: `Object`<br>
+Default: `undefined`
+
+The output to return from the state
+
+##### error
+
+Type: `Object`<br>
+Default: `undefined`
+
+The error to return from the state
+
+### mockResponse([stateName], [mockedResponse])
+
+Mocks a service response
+
+#### stateName
+
+Type: `string`<br>
+
+Specifies the state that will be mocked.
+
+#### mockedResponse
+
+Type: `Object`<br>
+Default: `undefined`
+
+##### response
+
+Type: `Object`<br>
+
+The response to return for the service call
+
+### mockResponseOnce([stateName], [mockedResponse])
+
+Mocks a service response once
+
+#### stateName
+
+Type: `string`<br>
+
+Specifies the state that will be mocked.
+
+#### mockedResponse
+
+Type: `Object`<br>
+Default: `undefined`
+
+##### response
+
+Type: `Object`<br>
+
+The response to return for the service call
+
+### mockResponseTimes([times], [stateName], [mockedResponse])
+
+Mocks a service response a specified number of times
+
+#### times
+
+Type: `number`<br>
+
+The number of executions to mock with the specified response
+
+#### stateName
+
+Type: `string`<br>
+
+Specifies the state that will be mocked.
+
+#### mockedResponse
+
+Type: `Object`<br>
+Default: `undefined`
+
+##### response
+
+Type: `Object`<br>
+
+The response to return for the service call
+
+### mockResponseInit()
+
+Initialises infrstructure required to mock service responses
+
+### mockResponseTearDown()
+
+Tears down infrastructure used to mock service responses
+
 ## Demo
 
 The [demo](../demo/) will run a number of tests using vitest. Ensure the environment variables are set and run

@@ -1,8 +1,10 @@
 import { TestExecutionStatus } from "@aws-sdk/client-sfn"
 
 export type TestSingleStateInput = {
+  state: string
   stateDefinition: Record<string, unknown>
   input?: Record<string, unknown>
+  mockedResult?: TestSingleStateOutput | null
 }
 
 export type TestSingleStateOutput = {
@@ -23,11 +25,12 @@ export type TestFunctionInput = {
   input?: Record<string, unknown>
 }
 
+type OutputError = {
+  message: string
+  cause: string
+}
 export type TestFunctionOutput = {
-  error?: {
-    message: string
-    cause: string
-  }
+  error?: OutputError
   status?: TestExecutionStatus
   output?: Record<string, unknown>
   stack: (TestSingleStateOutput & { stateName: string })[]
@@ -37,3 +40,27 @@ export type TestSubsetInput = TestFunctionInput & {
   startState: string
   endState: string
 }
+
+export type MockedState = { output?: Record<string, unknown>; error?: OutputError; nextState?: string }
+
+type StateMockAlways = MockedState & {
+  deleteWhenUsed: true
+}
+
+type StateMockSingle = MockedState & {
+  deleteWhenUsed: false
+}
+
+export type StateMock = StateMockAlways | StateMockSingle
+
+export type MockedResponse = { response?: Record<string, unknown> }
+
+type ResponseMockAlways = MockedResponse & {
+  deleteWhenUsed: true
+}
+
+type ResponseMockSingle = MockedResponse & {
+  deleteWhenUsed: false
+}
+
+export type ResponseMock = ResponseMockAlways | ResponseMockSingle

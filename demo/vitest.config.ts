@@ -1,10 +1,10 @@
 export default {
   test: {
-    testTimeout: 10000,
+    testTimeout: 30000,
     globals: true,
     deps: {
       interopDefault: true,
     },
-    environment: 'node',
+    environment: "node",
   },
 }

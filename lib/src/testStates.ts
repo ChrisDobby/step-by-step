@@ -7,6 +7,8 @@ import {
   TestSubsetInput,
 } from "./types"
 import { transformState, wait } from "./utils"
+import * as stateMocks from "./stateMocks"
+import * as responseMocks from "./responseMocks"
 
 const client = new SFNClient({ region: process.env.AWS_REGION })
 
@@ -20,7 +22,7 @@ const testState = async (
   try {
     result = await client.send(
       new TestStateCommand({
-        definition: JSON.stringify(transformState(stateDefinition)),
+        definition: JSON.stringify(stateDefinition),
         roleArn: process.env.AWS_ROLE_ARN!,
         input: JSON.stringify(input),
       })
@@ -47,9 +49,12 @@ const testState = async (
 }
 
 export const testSingleState = async ({
+  state,
   stateDefinition,
   input,
-}: TestSingleStateInput): Promise<TestSingleStateOutput> => testState(stateDefinition, input)
+  mockedResult,
+}: TestSingleStateInput): Promise<TestSingleStateOutput> =>
+  mockedResult || testState(transformState(await responseMocks.transformState(state, stateDefinition)), input)
 
 const execute = async ({
   functionDefinition,
@@ -63,7 +68,12 @@ const execute = async ({
   endState?: string
 }): Promise<TestFunctionOutput> => {
   const stateDefinition = functionDefinition.States[state]
-  const result = await testSingleState({ stateDefinition, input })
+  const result = await testSingleState({
+    state,
+    stateDefinition,
+    input,
+    mockedResult: stateMocks.mockedResult(state, functionDefinition.States[state].Next),
+  })
   const updatedStack = [...stack, { ...result, stateName: state }]
 
   return stateDefinition.End || state === endState || result.status === "FAILED"
@@ -76,3 +86,7 @@ export const testFunction = async ({ functionDefinition, input }: TestFunctionIn
 
 export const testSubset = async ({ functionDefinition, input, startState, endState }: TestSubsetInput) =>
   execute({ functionDefinition, input, state: startState, endState })
+
+export const resetMocks = () => {
+  stateMocks.reset()
+}
