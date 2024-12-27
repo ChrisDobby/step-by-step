@@ -1,10 +1,17 @@
 import { TestExecutionStatus } from "@aws-sdk/client-sfn"
 
 export type StateType = "Task" | "Pass" | "Wait" | "Choice" | "Succeed" | "Fail" | "Parallel" | "Map"
+export type ParallelState = {
+  Type: "Parallel"
+  Branches: TestFunctionInput["functionDefinition"][]
+  Next?: string
+  End?: boolean
+} & Record<string, unknown>
+type StateDefinition = { Type: Omit<StateType, "Parallel"> } & Record<string, unknown>
 export type TestSingleStateInput = {
   state?: string
-  stateDefinition: { Type: StateType } & Record<string, unknown>
-  input?: Record<string, unknown>
+  stateDefinition: StateDefinition | ParallelState
+  input?: Record<string, unknown> | Record<string, unknown>[]
   mockedResult?: TestSingleStateOutput | null
 }
 
@@ -15,7 +22,8 @@ export type TestSingleStateOutput = {
   }
   status?: TestExecutionStatus
   nextState?: string
-  output?: Record<string, unknown>
+  output?: Record<string, unknown> | Record<string, unknown>[]
+  // output?: Record<string, unknown>
 }
 
 export type TestFunctionInput = {
@@ -23,7 +31,7 @@ export type TestFunctionInput = {
     StartAt: string
     States: Record<string, { Type: StateType; End?: boolean; Next?: string } & Record<string, unknown>>
   }
-  input?: Record<string, unknown>
+  input?: Record<string, unknown> | Record<string, unknown>[]
 }
 
 type OutputError = {
@@ -33,7 +41,7 @@ type OutputError = {
 export type TestFunctionOutput = {
   error?: OutputError
   status?: TestExecutionStatus
-  output?: Record<string, unknown>
+  output?: Record<string, unknown> | Record<string, unknown>[]
   stack: (TestSingleStateOutput & { stateName: string })[]
 }
 
