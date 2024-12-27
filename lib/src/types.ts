@@ -1,8 +1,9 @@
 import { TestExecutionStatus } from "@aws-sdk/client-sfn"
 
+export type StateType = "Task" | "Pass" | "Wait" | "Choice" | "Succeed" | "Fail" | "Parallel" | "Map"
 export type TestSingleStateInput = {
   state?: string
-  stateDefinition: Record<string, unknown>
+  stateDefinition: { Type: StateType } & Record<string, unknown>
   input?: Record<string, unknown>
   mockedResult?: TestSingleStateOutput | null
 }
@@ -20,7 +21,7 @@ export type TestSingleStateOutput = {
 export type TestFunctionInput = {
   functionDefinition: {
     StartAt: string
-    States: Record<string, { Type: string; End?: boolean; Next?: string } & Record<string, unknown>>
+    States: Record<string, { Type: StateType; End?: boolean; Next?: string } & Record<string, unknown>>
   }
   input?: Record<string, unknown>
 }
