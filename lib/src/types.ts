@@ -6,6 +6,7 @@ export type ParallelState = {
   Branches: TestFunctionInput["functionDefinition"][]
   Next?: string
   End?: boolean
+  QueryLanguage?: "JSONata" | "JMESPath"
 } & Record<string, unknown>
 type StateDefinition = { Type: Omit<StateType, "Parallel"> } & Record<string, unknown>
 export type TestSingleStateInput = {
@@ -23,11 +24,12 @@ export type TestSingleStateOutput = {
   status?: TestExecutionStatus
   nextState?: string
   output?: Record<string, unknown> | Record<string, unknown>[]
-  // output?: Record<string, unknown>
+  stack?: (TestSingleStateOutput & { stateName: string })[]
 }
 
 export type TestFunctionInput = {
   functionDefinition: {
+    QueryLanguage?: "JSONata" | "JMESPath"
     StartAt: string
     States: Record<string, { Type: StateType; End?: boolean; Next?: string } & Record<string, unknown>>
   }

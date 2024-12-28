@@ -57,13 +57,16 @@ const testParallelState = async ({
   input: TestSingleStateInput["input"]
 }): Promise<TestSingleStateOutput> => {
   const branchOutputs = await Promise.all(
-    (stateDefinition as ParallelState).Branches.map(branch => testFunction({ functionDefinition: branch, input }))
+    (stateDefinition as ParallelState).Branches.map(branch =>
+      testFunction({ functionDefinition: { ...branch, QueryLanguage: stateDefinition.QueryLanguage }, input })
+    )
   )
 
   return {
     status: "SUCCEEDED",
     nextState: stateDefinition.Next,
     output: branchOutputs.map(({ output }) => output) as Record<string, unknown>[],
+    stack: branchOutputs.map(({ stack }) => stack).flat(),
   }
 }
 
@@ -97,14 +100,20 @@ const execute = async ({
   stack?: TestFunctionOutput["stack"]
   endState?: string
 }): Promise<TestFunctionOutput> => {
-  const stateDefinition = functionDefinition.States[state]
-  const result = await testSingleState({
+  const stateDefinition = functionDefinition.QueryLanguage
+    ? {
+        ...functionDefinition.States[state],
+        QueryLanguage: functionDefinition.States[state].QueryLanguage || functionDefinition.QueryLanguage,
+      }
+    : functionDefinition.States[state]
+
+  const { stack: singleStateStack, ...result } = await testSingleState({
     state,
     stateDefinition,
     input,
     mockedResult: stateMocks.mockedResult(state, functionDefinition.States[state].Next),
   })
-  const updatedStack = [...stack, { ...result, stateName: state }]
+  const updatedStack = [...stack, ...(singleStateStack || []), { ...result, stateName: state }]
 
   return stateDefinition.End || state === endState || result.status === "FAILED"
     ? { ...result, stack: updatedStack }
