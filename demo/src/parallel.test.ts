@@ -38,6 +38,71 @@ describe("parallel tests", () => {
     expect(result.stack).toHaveLength(2)
   })
 
+  it("should test nested parallel states", async () => {
+    const result = await testSingleState({
+      stateDefinition: {
+        Type: "Parallel",
+        End: true,
+        Branches: [
+          {
+            StartAt: "State1",
+            States: {
+              State1: {
+                QueryLanguage: "JSONata",
+                Type: "Pass",
+                Output: { branch: 1 },
+                End: true,
+              },
+            },
+          },
+          {
+            StartAt: "State2",
+            States: {
+              State2: {
+                Type: "Parallel",
+                End: true,
+                Branches: [
+                  {
+                    StartAt: "State2-1",
+                    States: {
+                      "State2-1": {
+                        QueryLanguage: "JSONata",
+                        Type: "Pass",
+                        Output: { branch: 2, subBranch: 1 },
+                        End: true,
+                      },
+                    },
+                  },
+                  {
+                    StartAt: "State2-2",
+                    States: {
+                      "State2-2": {
+                        QueryLanguage: "JSONata",
+                        Type: "Pass",
+                        Output: { branch: 2, subBranch: 2 },
+                        End: true,
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    })
+
+    expect(result.status).toBe("SUCCEEDED")
+    expect(result.output).toEqual([
+      { branch: 1 },
+      [
+        { branch: 2, subBranch: 1 },
+        { branch: 2, subBranch: 2 },
+      ],
+    ])
+    expect(result.stack).toHaveLength(4)
+  })
+
   it("should test a parallel state as part of a function", async () => {
     const result = await testFunction({
       functionDefinition: {

@@ -1,18 +1,28 @@
 import { TestExecutionStatus } from "@aws-sdk/client-sfn"
 
 export type StateType = "Task" | "Pass" | "Wait" | "Choice" | "Succeed" | "Fail" | "Parallel" | "Map"
-export type ParallelState = {
+type QueryLanguage = "JSONata" | "JSONPath"
+type StateInputOutput = Record<string, unknown> | Record<string, unknown>[]
+export type State = {
+  QueryLanguage?: QueryLanguage
+  End?: boolean
+  Next?: string
+} & Record<string, unknown>
+
+export type ParallelState = State & {
   Type: "Parallel"
   Branches: TestFunctionInput["functionDefinition"][]
   Next?: string
   End?: boolean
-  QueryLanguage?: "JSONata" | "JMESPath"
-} & Record<string, unknown>
-type StateDefinition = { Type: Omit<StateType, "Parallel"> } & Record<string, unknown>
+  QueryLanguage?: QueryLanguage
+}
+
+type StateDefinition = State & { Type: Omit<StateType, "Parallel"> }
+
 export type TestSingleStateInput = {
   state?: string
   stateDefinition: StateDefinition | ParallelState
-  input?: Record<string, unknown> | Record<string, unknown>[]
+  input?: StateInputOutput
   mockedResult?: TestSingleStateOutput | null
 }
 
@@ -23,17 +33,17 @@ export type TestSingleStateOutput = {
   }
   status?: TestExecutionStatus
   nextState?: string
-  output?: Record<string, unknown> | Record<string, unknown>[]
+  output?: StateInputOutput
   stack?: (TestSingleStateOutput & { stateName: string })[]
 }
 
 export type TestFunctionInput = {
   functionDefinition: {
-    QueryLanguage?: "JSONata" | "JMESPath"
+    QueryLanguage?: QueryLanguage
     StartAt: string
     States: Record<string, { Type: StateType; End?: boolean; Next?: string } & Record<string, unknown>>
   }
-  input?: Record<string, unknown> | Record<string, unknown>[]
+  input?: StateInputOutput
 }
 
 type OutputError = {
@@ -43,7 +53,7 @@ type OutputError = {
 export type TestFunctionOutput = {
   error?: OutputError
   status?: TestExecutionStatus
-  output?: Record<string, unknown> | Record<string, unknown>[]
+  output?: StateInputOutput
   stack: (TestSingleStateOutput & { stateName: string })[]
 }
 
