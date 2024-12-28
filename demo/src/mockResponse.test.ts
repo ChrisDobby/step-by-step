@@ -5,7 +5,7 @@ describe("mock response tests", () => {
   afterAll(mockResponseTearDown)
 
   const httpTask = {
-    Type: "Task",
+    Type: "Task" as const,
     Resource: "arn:aws:states:::http:invoke",
     Parameters: {
       ApiEndpoint: "https://67346234723.execute-api.eu-west-1.amazonaws.com/prod/test",

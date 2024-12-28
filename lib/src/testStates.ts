@@ -1,5 +1,6 @@
 import { SFNClient, TestStateCommand, TestStateCommandOutput, SFNServiceException } from "@aws-sdk/client-sfn"
 import {
+  ParallelState,
   TestFunctionInput,
   TestFunctionOutput,
   TestSingleStateInput,
@@ -48,13 +49,45 @@ const testState = async (
   }
 }
 
+const testParallelState = async ({
+  stateDefinition,
+  input,
+}: {
+  stateDefinition: ParallelState
+  input: TestSingleStateInput["input"]
+}): Promise<TestSingleStateOutput> => {
+  const branchOutputs = await Promise.all(
+    (stateDefinition as ParallelState).Branches.map(branch =>
+      testFunction({ functionDefinition: { ...branch, QueryLanguage: stateDefinition.QueryLanguage }, input })
+    )
+  )
+
+  return {
+    status: "SUCCEEDED",
+    nextState: stateDefinition.Next,
+    output: branchOutputs.map(({ output }) => output) as Record<string, unknown>[],
+    stack: branchOutputs.map(({ stack }) => stack).flat(),
+  }
+}
+
 export const testSingleState = async ({
   state = "step-by-step-single-state",
   stateDefinition,
   input,
   mockedResult,
-}: TestSingleStateInput): Promise<TestSingleStateOutput> =>
-  mockedResult || testState(transformState(responseMocks.transformState(state, stateDefinition)), input)
+}: TestSingleStateInput): Promise<TestSingleStateOutput> => {
+  if (mockedResult) {
+    return mockedResult
+  }
+
+  switch (stateDefinition.Type) {
+    case "Parallel":
+      return testParallelState({ stateDefinition: stateDefinition as ParallelState, input })
+
+    default:
+      return testState(transformState(responseMocks.transformState(state, stateDefinition)), input)
+  }
+}
 
 const execute = async ({
   functionDefinition,
@@ -67,14 +100,20 @@ const execute = async ({
   stack?: TestFunctionOutput["stack"]
   endState?: string
 }): Promise<TestFunctionOutput> => {
-  const stateDefinition = functionDefinition.States[state]
-  const result = await testSingleState({
+  const stateDefinition = functionDefinition.QueryLanguage
+    ? {
+        ...functionDefinition.States[state],
+        QueryLanguage: functionDefinition.States[state].QueryLanguage || functionDefinition.QueryLanguage,
+      }
+    : functionDefinition.States[state]
+
+  const { stack: singleStateStack, ...result } = await testSingleState({
     state,
     stateDefinition,
     input,
     mockedResult: stateMocks.mockedResult(state, functionDefinition.States[state].Next),
   })
-  const updatedStack = [...stack, { ...result, stateName: state }]
+  const updatedStack = [...stack, ...(singleStateStack || []), { ...result, stateName: state }]
 
   return stateDefinition.End || state === endState || result.status === "FAILED"
     ? { ...result, stack: updatedStack }
