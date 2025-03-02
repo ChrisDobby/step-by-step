@@ -1,5 +1,6 @@
 import { SFNClient, TestStateCommand, TestStateCommandOutput, SFNServiceException } from "@aws-sdk/client-sfn"
 import {
+  MapState,
   ParallelState,
   TestFunctionInput,
   TestFunctionOutput,
@@ -10,6 +11,8 @@ import {
 import { transformState, wait } from "./utils"
 import * as stateMocks from "./stateMocks"
 import * as responseMocks from "./responseMocks"
+import { testMapState } from "./map"
+import { testParallelState } from "./parallel"
 
 const client = new SFNClient({ region: process.env.AWS_REGION })
 
@@ -49,27 +52,6 @@ const testState = async (
   }
 }
 
-const testParallelState = async ({
-  stateDefinition,
-  input,
-}: {
-  stateDefinition: ParallelState
-  input: TestSingleStateInput["input"]
-}): Promise<TestSingleStateOutput> => {
-  const branchOutputs = await Promise.all(
-    (stateDefinition as ParallelState).Branches.map(branch =>
-      testFunction({ functionDefinition: { ...branch, QueryLanguage: stateDefinition.QueryLanguage }, input })
-    )
-  )
-
-  return {
-    status: "SUCCEEDED",
-    nextState: stateDefinition.Next,
-    output: branchOutputs.map(({ output }) => output) as Record<string, unknown>[],
-    stack: branchOutputs.map(({ stack }) => stack).flat(),
-  }
-}
-
 export const testSingleState = async ({
   state = "step-by-step-single-state",
   stateDefinition,
@@ -82,7 +64,10 @@ export const testSingleState = async ({
 
   switch (stateDefinition.Type) {
     case "Parallel":
-      return testParallelState({ stateDefinition: stateDefinition as ParallelState, input })
+      return testParallel({ stateDefinition: stateDefinition as ParallelState, input })
+
+    case "Map":
+      return testMap({ stateDefinition: stateDefinition as MapState, input })
 
     default:
       return testState(transformState(responseMocks.transformState(state, stateDefinition)), input)
@@ -129,3 +114,6 @@ export const testSubset = async ({ functionDefinition, input, startState, endSta
 export const resetMocks = () => {
   stateMocks.reset()
 }
+
+const testMap = testMapState(testFunction, testSingleState)
+const testParallel = testParallelState(testFunction)

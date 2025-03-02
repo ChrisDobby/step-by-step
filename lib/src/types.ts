@@ -17,7 +17,19 @@ export type ParallelState = State & {
   QueryLanguage?: QueryLanguage
 }
 
-type StateDefinition = State & { Type: Omit<StateType, "Parallel"> }
+export type MapState = State & {
+  Type: "Map"
+  ItemsPath?: string
+  Items?: string
+  ItemSelector?: Record<string, unknown>
+  ItemProcessor: TestFunctionInput["functionDefinition"] & {
+    ProcessorConfig: {
+      Mode: "INLINE"
+    }
+  }
+}
+
+type StateDefinition = State & { Type: Omit<StateType, "Parallel" | "Map"> }
 
 export type TestSingleStateInput = {
   state?: string
